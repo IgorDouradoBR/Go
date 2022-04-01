@@ -1,4 +1,3 @@
-//Alunos: Igor Dourado e Rafael Dias
 package main
 
 import (

@@ -1,4 +1,4 @@
-// Igor Dourado e Rafael Dias PIPESORT
+// PIPE SORT
 
 package main
 
@@ -8,48 +8,53 @@ import (
 	"time"
 )
 
-const N = 20 //20 valores a serem impressos
-
-func pipeSortGo(canalCorrente chan int, canalSeguinte chan int, canalAux chan int) {
-	var booleano bool = false
-	var corrente int
-	for {
-		var aux int = <-canalCorrente
-		if aux == 81 { // valor fixo mais a sobra
-			canalAux <- corrente
-			canalSeguinte <- aux
-			break
-		}
-		if booleano == false {
-			booleano = true
-			corrente = aux
-		} else if aux < corrente {
-			canalSeguinte <- corrente
-			corrente = aux
-		} else {
-			canalSeguinte <- aux
-		}
-	}
-}
+const N = 10
+const MAX = 100
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-	var arrayDeCanal [N + 1]chan int
-	var canalDoSort chan int = make(chan int)
+
+	var resultado chan int = make(chan int)
+	var canais [N + 1]chan int
 	for i := 0; i <= N; i++ {
-		arrayDeCanal[i] = make(chan int)
+		canais[i] = make(chan int)
 	}
 	for i := 0; i < N; i++ {
-		go pipeSortGo(arrayDeCanal[i], arrayDeCanal[i+1], canalDoSort)
+		go ordenaCelula(i, canais[i], canais[i+1], resultado, MAX)
 	}
+
+	rand.Seed(time.Now().UnixNano())
+
 	for i := 0; i < N; i++ {
-		var numero int = rand.Intn(80) // 80 é o valor max dos valores gerados
-		arrayDeCanal[0] <- numero
+		valor := rand.Intn(MAX) - rand.Intn(MAX)
+		canais[0] <- valor
+		fmt.Println(i, " : ", valor)
 	}
-	arrayDeCanal[0] <- 80 + 1 //80 é o valor máximo a ser alcançado mais uma sobra
-	fmt.Print("ORDENADO COM PIPESORT:  ")
+	canais[0] <- MAX + 1 
+
 	for i := 0; i < N; i++ {
-		fmt.Print(<-canalDoSort, " ")
+		fmt.Println(i, " : ", <-resultado)
 	}
-	<-arrayDeCanal[N] //liberando
+	<-canais[N]
+}
+
+func ordenaCelula(i int, entrada chan int, saida chan int, resultado chan int, max int) {
+	var valorEscolhido int
+	var undefined bool = true
+	for {
+		n := <-entrada
+		if n == max+1 { 
+			resultado <- valorEscolhido 
+			saida <- n   
+			break   
+		}
+		if undefined {
+			valorEscolhido = n
+			undefined = false
+		} else if n >= valorEscolhido {
+			saida <- n
+		} else {
+			saida <- valorEscolhido
+			valorEscolhido = n
+		}
+	}
 }

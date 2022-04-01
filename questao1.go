@@ -121,17 +121,18 @@ func Santa(){
     santaSem.Wait()
     mutex.Wait()
     if reindeer == 9{
-      fmt.Println("Prepara trenó")
+      fmt.Println("Prepare sleigh")
       for i:=0;i<9;i++{reindeerSem.Signal()}
       reindeer=0
     }else if elves==3{
-      fmt.Println("Ajuda elfos")
+      fmt.Println("Help elves")
     }
     mutex.Signal()
 
   }
 }
 
+//Não fiz um for infinito dentro desse e do próximo método pois estava travando quando tentei rodar em concorrência, fiz apenas um for infinito dentro do metodo Santa como indicado pelo livro
 func ReindeerFunc(){
       mutex.Wait()
       reindeer += 1
@@ -143,7 +144,7 @@ func ReindeerFunc(){
             time.Sleep(1e8)
 
       reindeerSem.Wait()
-      fmt.Println("Rena amarrada")
+      fmt.Println("Get hitched")
 }
 
 func ElvesFunc(){
@@ -154,7 +155,7 @@ func ElvesFunc(){
         santaSem.Signal()
       }else{elfTex.Signal()}
     mutex.Signal()
-    fmt.Println("Elfos get a help")
+    fmt.Println("Elves get help")
     time.Sleep(1e8)
     mutex.Wait()
       elves -=1

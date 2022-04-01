@@ -1,4 +1,3 @@
-//Alunos: Igor Dourado e Rafael Dias
 package main
 
 func pinng(entrada chan bool, saida chan bool, id int) {
